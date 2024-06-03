@@ -48,7 +48,7 @@ export default class MainSlider extends Slider {
         if (this.slides[i].tagName !== 'BUTTON') {
           let active = this.slides[i];
           this.container.insertBefore(active, this.slides[0]);
-          this.decorizeSlides();
+          this.decorationSlides();
           break;
         }
       }
@@ -65,7 +65,7 @@ export default class MainSlider extends Slider {
 			`;
 
 			this.bindTriggers();
-			this.decorizeSlides();
+			this.decorationSlides();
 
 			if (this.autoPlay) {
 				setInterval(() => this.nextSlide(), 5000);

@@ -43,10 +43,11 @@ export default class MainSlider extends Slider {
       });
 
       button.parentNode.previousElementSibling.addEventListener('click', (event) => {
-        event.preventDefault();
-        this.slides[this.slideIndex].classList.remove('animated', 'fadeIn');
-        // this.slideIndex = 0;
-        this.showSlides(this.slideIndex);
+				if (event.target.tagName !== 'A' && event.target.tagName !== 'IMG') {
+					event.preventDefault();
+					this.slides[this.slideIndex].classList.remove('animated', 'fadeIn');
+					this.showSlides(this.slideIndex);
+				}
       });
     });
 

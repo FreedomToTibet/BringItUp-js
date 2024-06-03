@@ -35,6 +35,10 @@ a:active {
 	color: inherit
 }
 
+a svg path {
+  pointer-events: none;
+}
+
 .title {
 	font-weight: 900;
 	font-size: 58px;

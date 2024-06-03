@@ -238,18 +238,17 @@ class VideoPlayer {
       button.addEventListener('click', () => {
         if (!button.closest('.module__video-item') || button.closest('.module__video-item').getAttribute('data-disabled') !== 'true') {
           this.activeButton = button;
-          if (document.querySelector('iframe#frame')) {
-            this.overlay.style.display = 'flex';
-            if (this.path !== button.getAttribute('data-url')) {
-              this.path = button.getAttribute('data-url');
-              this.player.loadVideoById({
-                videoId: this.path
-              });
-            }
-          } else {
-            this.path = button.getAttribute('data-url');
-            this.createPlayer(this.path);
+          this.overlay.style.display = 'flex';
+          this.path = button.getAttribute('data-url');
+          // Delete the existing iframe and create a new one
+          const frameContainer = document.getElementById('frame');
+          if (frameContainer) {
+            frameContainer.remove();
           }
+          const newFrame = document.createElement('div');
+          newFrame.setAttribute('id', 'frame');
+          this.overlay.appendChild(newFrame);
+          this.createPlayer(this.path);
         }
       });
     });
@@ -259,14 +258,29 @@ class VideoPlayer {
       this.overlay.style.display = 'none';
       this.player.stopVideo();
     });
+    this.overlay.addEventListener('click', event => {
+      if (!event.target.closest('.player')) {
+        this.overlay.style.display = 'none';
+        this.player.stopVideo();
+      }
+    });
   }
   createPlayer(url) {
+    // Ensure there's only one 'frame' div at a time
+    const existingFrame = this.overlay.querySelector('#frame');
+    if (existingFrame) {
+      existingFrame.remove();
+    }
+    const videoContainer = this.overlay.querySelector('.video');
+    const frameContainer = document.createElement('div');
+    frameContainer.setAttribute('id', 'frame');
+    videoContainer.appendChild(frameContainer);
     this.player = new YT.Player('frame', {
       height: '100%',
       width: '100%',
       videoId: `${url}`,
       events: {
-        'onStateChange': this.onPlayerStateChange
+        onStateChange: this.onPlayerStateChange
       }
     });
     this.overlay.style.display = 'flex';
@@ -389,10 +403,11 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.showSlides(this.slideIndex += 1);
       });
       button.parentNode.previousElementSibling.addEventListener('click', event => {
-        event.preventDefault();
-        this.slides[this.slideIndex].classList.remove('animated', 'fadeIn');
-        // this.slideIndex = 0;
-        this.showSlides(this.slideIndex);
+        if (event.target.tagName !== 'A' && event.target.tagName !== 'IMG') {
+          event.preventDefault();
+          this.slides[this.slideIndex].classList.remove('animated', 'fadeIn');
+          this.showSlides(this.slideIndex);
+        }
       });
     });
     document.querySelectorAll('.prevmodule').forEach(button => {
@@ -477,7 +492,7 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
         if (this.slides[i].tagName !== 'BUTTON') {
           let active = this.slides[i];
           this.container.insertBefore(active, this.slides[0]);
-          this.decorizeSlides();
+          this.decorationSlides();
           break;
         }
       }
@@ -492,7 +507,7 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 				align-items: flex-start;
 			`;
       this.bindTriggers();
-      this.decorizeSlides();
+      this.decorationSlides();
       if (this.autoPlay) {
         setInterval(() => this.nextSlide(), 5000);
       }
